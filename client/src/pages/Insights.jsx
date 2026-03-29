@@ -1,0 +1,149 @@
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { BarChart3, PieChart as PieIcon, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import API from '../api/ideas';
+
+const COLORS = ['#F97316', '#10B981', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899'];
+
+export default function Insights() {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const { data } = await API.getStats();
+        setStats(data);
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin" />
+    </div>
+  );
+
+  const statusData = stats?.byStatus?.map(s => ({ name: s._id, value: s.count })) || [];
+  const categoryData = stats?.byCategory?.map(c => ({ name: c._id, count: c.count })) || [];
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-12">
+      <div className="bg-white border-b border-gray-100 sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link to="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </Link>
+            <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-primary-500" />
+              Idea Insights
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Status Distribution */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100"
+          >
+            <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+              <PieIcon className="w-5 h-5 text-emerald-500" />
+              Status Distribution
+            </h3>
+            <div className="h-[350px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={80}
+                    outerRadius={120}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {statusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Legend verticalAlign="bottom" height={36}/>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+
+          {/* Category Distribution */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100"
+          >
+            <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-primary-500" />
+              Category Overview
+            </h3>
+            <div className="h-[350px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                  <Tooltip 
+                    cursor={{ fill: '#f8fafc' }}
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                    {categoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Impact Summary Placeholder */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-8 bg-gradient-to-r from-primary-500 to-orange-600 rounded-3xl p-8 text-white"
+        >
+          <div className="max-w-2xl">
+            <h2 className="text-2xl font-bold mb-2">Automation Impact</h2>
+            <p className="text-primary-50 opacity-90 mb-6">
+              Visualizing the transformation of ideas into efficient automated solutions. 
+              The statistics above represent our collective progress in Software, Controls, Electrical, and Mechanical domains.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+              <div>
+                <p className="text-primary-200 text-sm">Total Potential Saved</p>
+                <p className="text-2xl font-bold">500+ Hours</p>
+              </div>
+              <div>
+                <p className="text-primary-200 text-sm">Active Projects</p>
+                <p className="text-2xl font-bold">{stats?.total || 0}</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
