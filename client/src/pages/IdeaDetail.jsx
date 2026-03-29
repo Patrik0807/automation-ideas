@@ -53,10 +53,10 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-  if (initialData?.images) {
-    setPreviews(initialData.images); // populate previews with existing DB URLs
+  if (idea?.images) {
+    setPreviews(idea.images); // populate previews with existing DB URLs
   }
-}, [initialData]);
+}, [idea]);
 
   useEffect(() => {
     fetchIdea();
@@ -588,7 +588,7 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
       <IdeaForm
         isOpen={showEditForm}
         onClose={() => setShowEditForm(false)}
-        initialData={idea}
+        idea={idea}
         existingImages={idea.images} 
         onCreated={(updated) => {
           setIdea(updated);
