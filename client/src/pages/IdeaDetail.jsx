@@ -21,17 +21,18 @@ import {
   Send,
   FileText,
   User,
-  Edit
+  Edit,
+  Wrench,
+  Target
 } from 'lucide-react';
 import IdeaForm from '../components/IdeaForm';
 
+/** Must match the Mongoose enum in Idea.js exactly */
 const allStatuses = [
-  'Submitted',
-  'Under Review',
+  'Pending',
   'Approved',
   'In Progress',
   'Implemented',
-  'Rejected'
 ];
 
 export default function IdeaDetail() {
@@ -102,7 +103,7 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
     try {
       await API.deleteIdea(id);
       toast.success('Idea deleted successfully');
-      navigate('/');
+      navigate('/ideas');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to delete idea');
     } finally {
@@ -110,17 +111,10 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
     }
   };
 
-  // Progress bar percentage
+  // Progress bar — based on the 4 valid model statuses
   const getProgress = () => {
-    const statusOrder = [
-      'Submitted',
-      'Under Review',
-      'Approved',
-      'In Progress',
-      'Implemented'
-    ];
+    const statusOrder = ['Pending', 'Approved', 'In Progress', 'Implemented'];
     const idx = statusOrder.indexOf(idea?.status);
-    if (idea?.status === 'Rejected') return 100;
     if (idx === -1) return 0;
     return ((idx + 1) / statusOrder.length) * 100;
   };
@@ -129,7 +123,7 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-primary-500 rounded-full animate-spin" />
           <p className="text-slate-500 font-medium">Loading idea...</p>
         </div>
       </div>
@@ -144,15 +138,15 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
   return (
     <div className="min-h-screen bg-gray-50 pb-12">
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary-500 via-primary-600 to-orange-700 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="bg-white border-b border-gray-100 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/5 rounded-full -translate-y-1/2 translate-x-1/4" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-12">
           <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-primary-100 hover:text-white transition-colors mb-6"
+            onClick={() => navigate('/ideas')}
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm font-medium">Back to Dashboard</span>
+            <span className="font-semibold text-sm">Back to Ideas</span>
           </button>
 
           <motion.div
@@ -161,58 +155,80 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
           >
             <div className="flex items-start justify-between gap-4 flex-col sm:flex-row">
               <div className="flex-1">
-                <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+                <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mb-3 tracking-tight">
                   {idea.title}
                 </h1>
                 <div className="flex flex-wrap items-center gap-3">
                   <StatusBadge status={idea.status} size="lg" />
-                  <span className="text-primary-100 text-sm flex items-center gap-1.5">
-                    <Tag className="w-3.5 h-3.5" />
+                  <span className="text-slate-600 text-sm flex items-center gap-1.5 font-medium">
+                    <Tag className="w-3.5 h-3.5 text-slate-400" />
                     {idea.category}
                   </span>
                   <span
                     className={`inline-flex items-center text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider
                       ${
-                        idea.priority === 'High'
-                          ? 'bg-red-500/20 text-red-100 border border-red-400/30'
-                          : idea.priority === 'Medium'
-                          ? 'bg-orange-500/20 text-orange-100 border border-orange-400/30'
-                          : 'bg-white/10 text-white border border-white/20'
-                      }`}
+                        idea?.priority === 'High'
+                          ? 'bg-red-50 text-red-600 border border-red-200'
+                          : idea?.priority === 'Medium'
+                          ? 'bg-amber-50 text-amber-600 border border-amber-200'
+                          : 'bg-slate-50 text-slate-600 border border-slate-200'
+                        }`}
                   >
                     {idea.priority} Priority
                   </span>
+                  
+                  <span className="text-slate-600 bg-white border border-slate-200 text-[10px] uppercase tracking-wider flex items-center gap-1.5 font-bold px-3 py-1 rounded-full">
+                    <Wrench className="w-3 h-3 text-slate-400" />
+                    {idea.technicalFeasibility || 'Medium'}
+                  </span>
 
-                  {/* Priority Toggle for Admin/Owner */}
+                  {/* Inline Dropdowns mapping exactly to user request */}
                   {(isAdmin || isOwner) && (
-                    <div className="flex gap-1 ml-2">
-                      {['High', 'Medium', 'Low'].map((p) => (
-                        <button
-                          key={p}
-                          onClick={async () => {
-                            if (p === idea.priority) return;
-                            try {
-                              const { data } = await API.updateIdea(id, { priority: p });
-                              setIdea(data);
-                              toast.success(`Priority changed to ${p}`);
-                            } catch (e) {
-                              toast.error('Failed to change priority');
-                            }
-                          }}
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all
-                            ${
-                              idea.priority === p
-                                ? p === 'High' ? 'bg-red-500 text-white' : p === 'Medium' ? 'bg-orange-500 text-white' : 'bg-slate-500 text-white'
-                                : 'bg-white/10 text-white/50 hover:bg-white/20 hover:text-white'
-                            }`}
-                        >
-                          {p}
-                        </button>
-                      ))}
+                    <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-200">
+                      <select
+                        value={idea.priority}
+                        onChange={async (e) => {
+                          const val = e.target.value;
+                          if (val === idea.priority) return;
+                          try {
+                            const { data } = await API.updateIdea(id, { priority: val });
+                            setIdea(data);
+                            toast.success(`Priority set to ${val}`);
+                          } catch (err) {
+                            toast.error('Failed to change priority');
+                          }
+                        }}
+                        className="text-[10px] font-bold uppercase text-slate-600 bg-gray-100 border-none rounded-full px-2.5 py-1 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer hover:bg-gray-200 transition-colors"
+                      >
+                        <option value="Low">Set: Low</option>
+                        <option value="Medium">Set: Med</option>
+                        <option value="High">Set: High</option>
+                      </select>
+                      
+                      <select
+                        value={idea.technicalFeasibility || 'Medium'}
+                        onChange={async (e) => {
+                          const val = e.target.value;
+                          if (val === idea.technicalFeasibility) return;
+                          try {
+                            const { data } = await API.updateIdea(id, { technicalFeasibility: val });
+                            setIdea(data);
+                            toast.success(`Feasibility set to ${val}`);
+                          } catch (err) {
+                            toast.error('Failed to change feasibility');
+                          }
+                        }}
+                        className="text-[10px] font-bold uppercase text-slate-600 bg-gray-100 border-none rounded-full px-2.5 py-1 focus:ring-2 focus:ring-primary-500/20 outline-none cursor-pointer hover:bg-gray-200 transition-colors"
+                      >
+                        <option value="Easy">Set: Easy</option>
+                        <option value="Medium">Set: Med</option>
+                        <option value="Hard">Set: Hard</option>
+                      </select>
                     </div>
                   )}
-                  <span className="text-primary-100 text-sm flex items-center gap-1.5">
-                    <CalendarDays className="w-3.5 h-3.5" />
+
+                  <span className="text-slate-500 text-sm flex items-center gap-1.5 font-medium ml-2">
+                    <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
                     {new Date(idea.createdAt).toLocaleDateString('en-US', {
                       month: 'long',
                       day: 'numeric',
@@ -222,21 +238,22 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
                 </div>
               </div>
 
+              {/* Action Buttons */}
               <div className="flex gap-2">
                 {(isAdmin || isOwner) && (
                   <>
                     <button
                       onClick={() => setShowEditForm(true)}
-                      className="flex items-center gap-2 bg-white/10 hover:bg-blue-500/90 text-white
-                                 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium"
+                      className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700
+                                 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-semibold"
                     >
                       <Edit className="w-4 h-4" />
                       Edit Idea
                     </button>
                     <button
                       onClick={() => setShowDeleteConfirm(true)}
-                      className="flex items-center gap-2 bg-white/10 hover:bg-red-500/90 text-white
-                                 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium"
+                      className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600
+                                 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-semibold border border-red-100"
                     >
                       <Trash2 className="w-4 h-4" />
                       Delete
@@ -246,8 +263,8 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
                 {isAdmin && (
                   <button
                     onClick={() => setShowStatusUpdate(!showStatusUpdate)}
-                    className="flex items-center gap-2 bg-white text-primary-600 font-bold
-                               px-5 py-2.5 rounded-xl shadow-lg hover:shadow-xl transition-all text-sm"
+                    className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-bold
+                               px-5 py-2.5 rounded-xl shadow-lg shadow-primary-500/20 transition-all text-sm active:scale-95"
                   >
                     <TrendingUp className="w-4 h-4" />
                     Update Status
@@ -261,20 +278,20 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
           </motion.div>
 
           {/* Progress Bar */}
-          <div className="mt-6">
-            <div className="flex justify-between text-xs text-primary-200 mb-2">
+          <div className="mt-8 mb-4">
+            <div className="flex justify-between text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">
               <span>Progress</span>
-              <span>{Math.round(getProgress())}%</span>
+              <span className="text-primary-600">{Math.round(getProgress())}%</span>
             </div>
-            <div className="w-full bg-white/20 rounded-full h-2.5 overflow-hidden">
+            <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${getProgress()}%` }}
                 transition={{ duration: 1, ease: 'easeOut' }}
                 className={`h-full rounded-full ${
                   idea.status === 'Rejected'
-                    ? 'bg-red-400'
-                    : 'bg-white'
+                    ? 'bg-red-500'
+                    : 'bg-primary-500'
                 }`}
               />
             </div>
@@ -356,7 +373,23 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column — Main Info */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Description */}
+            
+            {/* Problem Statement */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"
+            >
+              <h2 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                <Target className="w-5 h-5 text-primary-500" />
+                Problem Statement
+              </h2>
+              <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
+                {idea.problemStatement || <span className="text-slate-400 italic">Not provided for this legacy idea.</span>}
+              </p>
+            </motion.div>
+
+            {/* Description / Proposed Solution */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -364,7 +397,7 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
             >
               <h2 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-primary-500" />
-                Description
+                Proposed Solution
               </h2>
               <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
                 {idea.description}

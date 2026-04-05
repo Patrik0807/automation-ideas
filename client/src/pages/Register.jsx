@@ -37,8 +37,8 @@ export default function Register() {
     setLoading(true);
     try {
       await register(form.name, form.email, form.password, form.department);
-      toast.success('Account created successfully! 🎉');
-      navigate('/');
+      toast.success('🎉 Account created successfully!');
+      navigate('/ideas');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed');
     } finally {
@@ -49,40 +49,53 @@ export default function Register() {
   return (
     <div className="min-h-screen flex">
       {/* Left — Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-orange-600 to-primary-700 relative overflow-hidden">
-        <div className="absolute top-32 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-10 left-10 w-72 h-72 bg-white/5 rounded-full blur-2xl" />
+      <div className="hidden lg:flex lg:w-1/2 bg-gray-50 border-r border-gray-100 relative overflow-hidden">
+        {/* Subtle red grid */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{ backgroundImage: 'linear-gradient(#EB0A1E 1px, transparent 1px), linear-gradient(90deg, #EB0A1E 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+        />
+        <div className="absolute -bottom-10 left-10 w-72 h-72 bg-primary-500/5 rounded-full blur-[80px]" />
 
-        <div className="relative z-10 flex flex-col justify-center px-16">
+        <div className="relative z-10 flex flex-col justify-center px-16 w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-2xl flex items-center justify-center mb-8">
-              <UserPlus className="w-8 h-8 text-white" />
+            {/* Toyota logo */}
+            <div className="flex items-center gap-4 mb-12">
+              <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
+                <svg viewBox="0 0 100 60" className="w-12 h-12" fill="none">
+                  <ellipse cx="50" cy="30" rx="48" ry="28" stroke="#EB0A1E" strokeWidth="5" fill="none" />
+                  <ellipse cx="50" cy="30" rx="20" ry="28" stroke="#EB0A1E" strokeWidth="5" fill="none" />
+                  <ellipse cx="50" cy="14" rx="30" ry="10" stroke="#EB0A1E" strokeWidth="5" fill="none" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-slate-900 font-black text-xl tracking-tight leading-none">TOYOTA</p>
+                <p className="text-primary-600 text-xs font-bold tracking-[0.2em] uppercase">Automated Logistics</p>
+              </div>
             </div>
-            <h1 className="text-5xl font-bold text-white leading-tight mb-4">
-              Join the
-              <br />
-              <span className="text-orange-200">Innovation Team</span>
+            <h1 className="text-5xl font-black text-slate-900 leading-tight mb-4 tracking-tight">
+              Join the<br />
+              <span className="text-primary-600">Innovation Team</span>
             </h1>
-            <p className="text-primary-100 text-lg leading-relaxed max-w-md">
-              Create your account and start submitting automation ideas
-              that make a real impact.
+            <p className="text-slate-500 font-medium text-lg leading-relaxed max-w-md">
+              Create your account and start submitting automation ideas that make a real impact.
             </p>
 
             <div className="mt-12 space-y-3">
-              {['Submit ideas in seconds', 'Track progress in real-time', 'Measure impact'].map((text, i) => (
+              {['Submit ideas in seconds', 'Track progress in real-time', 'Measure automation impact'].map((text, i) => (
                 <motion.div
                   key={text}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 + i * 0.1 }}
-                  className="flex items-center gap-3 text-primary-100"
+                  className="flex items-center gap-3 text-slate-600 font-medium"
                 >
-                  <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs">✓</span>
+                  <div className="w-6 h-6 bg-white border border-gray-200 shadow-sm rounded-full flex items-center justify-center">
+                    <span className="text-primary-600 text-xs">✓</span>
                   </div>
                   {text}
                 </motion.div>
@@ -93,17 +106,33 @@ export default function Register() {
       </div>
 
       {/* Right — Register Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
+      <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md"
         >
+          {/* Back to home */}
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-8 transition-colors"
+          >
+            ← Back to Home
+          </Link>
+
+          {/* Mobile TAL logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="bg-primary-500 p-3 rounded-xl">
-              <Lightbulb className="w-6 h-6 text-white" />
+            <div className="bg-white border border-gray-100 shadow-sm p-2 rounded-xl">
+              <svg viewBox="0 0 100 60" className="w-10 h-6" fill="none">
+                <ellipse cx="50" cy="30" rx="48" ry="28" stroke="#EB0A1E" strokeWidth="6" fill="none" />
+                <ellipse cx="50" cy="30" rx="20" ry="28" stroke="#EB0A1E" strokeWidth="6" fill="none" />
+                <ellipse cx="50" cy="14" rx="30" ry="10" stroke="#EB0A1E" strokeWidth="6" fill="none" />
+              </svg>
             </div>
-            <h1 className="text-2xl font-bold gradient-text">IdeaFlow</h1>
+            <div>
+              <p className="font-black text-slate-800 text-base leading-none">TOYOTA</p>
+              <p className="text-primary-500 text-[10px] font-bold tracking-widest uppercase">Automated Logistics</p>
+            </div>
           </div>
 
           <div className="bg-white rounded-3xl p-8 shadow-xl shadow-gray-200/50 border border-gray-100">

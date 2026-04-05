@@ -1,121 +1,117 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import {
-  Lightbulb,
   LogOut,
   User,
   ChevronDown,
   Shield,
   Menu,
   X,
-  BarChart
+  BarChart,
+  Lightbulb,
+  LayoutDashboard,
 } from 'lucide-react';
+
+/* ─── Toyota Logo SVG (inline, no external dep) ─────────────── */
+function ToyotaLogo({ className = 'w-8 h-8' }) {
+  return (
+    <svg viewBox="0 0 100 60" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="50" cy="30" rx="48" ry="28" stroke="#EB0A1E" strokeWidth="5.5" fill="none" />
+      <ellipse cx="50" cy="30" rx="20" ry="28" stroke="#EB0A1E" strokeWidth="5.5" fill="none" />
+      <ellipse cx="50" cy="14" rx="30" ry="10" stroke="#EB0A1E" strokeWidth="5.5" fill="none" />
+    </svg>
+  );
+}
+
+const NAV_LINKS = [
+  { to: '/ideas',     label: 'Ideas',       icon: Lightbulb },
+  { to: '/insights',  label: 'Insights',    icon: BarChart },
+];
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const location  = useLocation();
   const [showProfile, setShowProfile] = useState(false);
-  const [showMobile, setShowMobile] = useState(false);
+  const [showMobile,  setShowMobile]  = useState(false);
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <nav className="sticky top-0 z-50 bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 shadow-lg shadow-primary-500/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <motion.div
-              whileHover={{ rotate: 15, scale: 1.1 }}
-              className="bg-white/20 backdrop-blur-sm p-2 rounded-xl"
-            >
-              <Lightbulb className="w-6 h-6 text-white" />
-            </motion.div>
-            <div>
-              <h1 className="text-white font-bold text-xl tracking-tight">
-                IdeaFlow
-              </h1>
-              <p className="text-primary-100 text-[10px] font-medium tracking-wider uppercase hidden sm:block">
-                Automation Ideas
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-24 lg:h-28">
+
+          {/* ── Logo ── */}
+          <Link to="/ideas" className="flex items-center gap-4 group">
+            <ToyotaLogo className="w-14 h-14 group-hover:opacity-90 transition-opacity" />
+            <div className="leading-tight">
+              <p className="text-slate-900 font-black text-xl tracking-tight leading-none mb-0.5">TOYOTA</p>
+              <p className="text-primary-600 text-[11px] sm:text-xs font-bold tracking-[0.2em] uppercase leading-none">
+                Automated Logistics
               </p>
             </div>
           </Link>
-          
-          <div className="hidden md:flex items-center gap-6 ml-8 flex-1">
-            <Link 
-              to="/" 
-              className="text-primary-100 hover:text-white font-medium text-sm transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link 
-              to="/ideas" 
-              className="text-primary-100 hover:text-white font-medium text-sm transition-colors"
-            >
-              Ideas
-            </Link>
-            <Link 
-              to="/motive" 
-              className="text-primary-100 hover:text-white font-medium text-sm transition-colors"
-            >
-              Motive
-            </Link>
-            <Link 
-              to="/approach" 
-              className="text-primary-100 hover:text-white font-medium text-sm transition-colors"
-            >
-              Approach
-            </Link>
-            <Link 
-              to="/insights" 
-              className="text-primary-100 hover:text-white font-medium text-sm transition-colors flex items-center gap-2"
-            >
-              <BarChart className="w-4 h-4" />
-              Insights
-            </Link>
+
+          {/* ── Desktop Nav Links ── */}
+          <div className="hidden md:flex items-center gap-3 ml-12 flex-1">
+            {NAV_LINKS.map(({ to, label, icon: Icon }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-[17px] font-extrabold transition-all duration-150
+                  ${isActive(to)
+                    ? 'bg-primary-50 text-primary-600 border border-primary-100 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-gray-50'
+                  }`}
+              >
+                <Icon className="w-5 h-5" />
+                {label}
+              </Link>
+            ))}
           </div>
 
-          {/* Desktop User Menu */}
-          <div className="hidden sm:flex items-center gap-4">
+          {/* ── Desktop User Menu ── */}
+          <div className="hidden sm:flex items-center gap-3">
             {user?.role === 'admin' && (
-              <span className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+              <span className="flex items-center gap-1.5 bg-primary-50 border border-primary-100
+                                text-primary-600 text-xs font-semibold px-3 py-1.5 rounded-full">
                 <Shield className="w-3.5 h-3.5" />
                 Admin
               </span>
             )}
+
             <div className="relative">
               <button
                 onClick={() => setShowProfile(!showProfile)}
-                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm
-                           text-white px-4 py-2 rounded-xl transition-all duration-200"
+                className="flex items-center gap-2.5 bg-white hover:bg-gray-50 border border-gray-200
+                           text-slate-700 px-4 py-2.5 rounded-2xl transition-all duration-200"
               >
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4" />
+                <div className="w-9 h-9 bg-primary-50 border border-primary-100 rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-primary-600" />
                 </div>
-                <span className="font-medium text-sm">{user?.name}</span>
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform ${showProfile ? 'rotate-180' : ''}`}
-                />
+                <span className="font-bold text-[15px] text-slate-800 tracking-tight">{user?.name}</span>
+                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showProfile ? 'rotate-180' : ''}`} />
               </button>
 
               <AnimatePresence>
                 {showProfile && (
                   <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl
+                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                    className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl
                                border border-gray-100 overflow-hidden"
                   >
-                    <div className="p-4 bg-gradient-to-r from-primary-50 to-orange-50 border-b border-gray-100">
-                      <p className="font-semibold text-slate-800">
-                        {user?.name}
-                      </p>
+                    <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-100">
+                      <p className="font-semibold text-slate-800">{user?.name}</p>
                       <p className="text-sm text-slate-500">{user?.email}</p>
                       <p className="text-xs text-primary-600 font-medium mt-1 capitalize">
                         {user?.role} • {user?.department}
@@ -137,43 +133,57 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile menu button */}
+          {/* ── Mobile Menu Button ── */}
           <button
             onClick={() => setShowMobile(!showMobile)}
-            className="sm:hidden text-white p-2"
+            className="sm:hidden text-slate-500 hover:text-slate-900 p-2 transition-colors"
           >
             {showMobile ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* ── Mobile Menu ── */}
       <AnimatePresence>
         {showMobile && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="sm:hidden bg-primary-700 border-t border-primary-600 overflow-hidden"
+            className="sm:hidden bg-white border-t border-gray-100 overflow-hidden shadow-md"
           >
-            <div className="px-4 py-4 space-y-3">
-              <div className="flex items-center gap-3 text-white">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5" />
+            <div className="px-4 py-4 space-y-2">
+              {NAV_LINKS.map(({ to, label, icon: Icon }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={() => setShowMobile(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors
+                    ${isActive(to) ? 'bg-primary-50 text-primary-600' : 'text-slate-500 hover:text-slate-900 hover:bg-gray-50'}`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {label}
+                </Link>
+              ))}
+              <div className="pt-3 mt-3 border-t border-gray-100">
+                <div className="flex items-center gap-3 px-4 py-2 text-slate-700">
+                  <div className="w-8 h-8 bg-primary-50 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-primary-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
+                    <p className="text-xs text-slate-500">{user?.email}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold">{user?.name}</p>
-                  <p className="text-primary-200 text-sm">{user?.email}</p>
-                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50
+                             rounded-xl transition-colors text-sm font-medium"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
               </div>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 text-white/90 hover:bg-white/10
-                           rounded-xl transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </button>
             </div>
           </motion.div>
         )}

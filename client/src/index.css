@@ -7,7 +7,16 @@
 @layer base {
   body {
     font-family: 'Inter', system-ui, sans-serif;
-    @apply bg-gray-50 text-slate-800;
+    @apply text-slate-800;
+    background-color: #FAFAFA;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(235, 10, 30, 0.04) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(15, 23, 42, 0.02) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(235, 10, 30, 0.05) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(15, 23, 42, 0.03) 0px, transparent 50%),
+      radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 32px 32px;
+    background-attachment: fixed;
   }
 }
 
@@ -29,7 +38,7 @@
   }
 
   .premium-card:hover {
-    @apply shadow-xl shadow-primary-500/5 border-primary-200;
+    @apply shadow-xl shadow-primary-500/10 border-primary-200;
     transform: translateY(-4px);
   }
 
@@ -37,7 +46,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(circle at 0% 0%, rgba(249, 115, 22, 0.05) 0%, transparent 60%);
+    background-image: radial-gradient(circle at 0% 0%, rgba(235, 10, 30, 0.04) 0%, transparent 60%);
     pointer-events: none;
   }
 
@@ -47,7 +56,7 @@
     box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5), 0 10px 20px rgba(0, 0, 0, 0.05);
   }
 
-  /* Gradient button */
+  /* Primary button — Toyota Red */
   .btn-primary {
     @apply bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold
            px-6 py-3 rounded-xl shadow-lg shadow-primary-500/25
@@ -80,24 +89,25 @@
 }
 
 @layer utilities {
-  /* Subtle orange glow */
-  .glow-orange {
-    box-shadow: 0 0 40px rgba(249, 115, 22, 0.15);
+  /* Subtle red glow */
+  .glow-red {
+    box-shadow: 0 0 40px rgba(235, 10, 30, 0.15);
   }
 
-  /* Background pattern */
+  /* Background dot pattern */
   .bg-grid-pattern {
     background-image: radial-gradient(circle, #94a3b8 1px, transparent 1px);
     background-size: 32px 32px;
   }
 
+  /* TAL mesh gradient — dark red + neutral */
   .bg-mesh-gradient {
-    background-color: #f1f5f9;
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(249, 115, 22, 0.1) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.1) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(249, 115, 22, 0.1) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+    background-color: #f3f4f6;
+    background-image:
+      radial-gradient(at 0%   0%,   rgba(235, 10, 30, 0.08)  0px, transparent 50%),
+      radial-gradient(at 100% 0%,   rgba(30, 30, 30, 0.05)   0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(235, 10, 30, 0.06)  0px, transparent 50%),
+      radial-gradient(at 0%   100%, rgba(10, 10, 10, 0.04)   0px, transparent 50%);
   }
 
   /* Smooth page transition */
@@ -106,7 +116,7 @@
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar — Toyota Red */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -116,26 +126,26 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #f97316;
+  background: #EB0A1E;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ea580c;
+  background: #C9091A;
 }
 
-/* Gradient text utility */
+/* Red gradient text utility */
 .gradient-text {
-  background: linear-gradient(135deg, #F97316, #EA580C);
+  background: linear-gradient(135deg, #EB0A1E, #A80716);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Glowing border animation */
+/* Glowing border animation — red */
 @keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.1); }
-  50% { box-shadow: 0 0 30px rgba(249, 115, 22, 0.25); }
+  0%, 100% { box-shadow: 0 0 20px rgba(235, 10, 30, 0.10); }
+  50%       { box-shadow: 0 0 30px rgba(235, 10, 30, 0.25); }
 }
 
 .glow-pulse {
@@ -145,9 +155,25 @@
 /* Floating animation */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
+  50%       { transform: translateY(-6px); }
 }
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+/* Landing page connector arrows */
+.approach-connector {
+  position: relative;
+}
+.approach-connector::after {
+  content: '';
+  position: absolute;
+  right: -28px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 2px;
+  background: #EB0A1E;
+  opacity: 0.4;
 }

@@ -9,9 +9,11 @@ const categories = ['Software', 'Controls', 'Electrical', 'Mechanical'];
 export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
   const [form, setForm] = useState({
     title: '',
+    problemStatement: '',
     description: '',
     category: '',
     priority: 'Medium',
+    technicalFeasibility: 'Medium',
     timeSaved: '',
     costSaved: '',
     impactNotes: ''
@@ -30,9 +32,11 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
       if (initialData) {
         setForm({
           title: initialData.title || '',
+          problemStatement: initialData.problemStatement || '',
           description: initialData.description || '',
           category: initialData.category || '',
           priority: initialData.priority || 'Medium',
+          technicalFeasibility: initialData.technicalFeasibility || 'Medium',
           timeSaved: initialData.impact?.timeSaved || '',
           costSaved: initialData.impact?.costSaved || '',
           impactNotes: initialData.impact?.notes || ''
@@ -46,9 +50,11 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
       } else {
         setForm({
           title: '',
+          problemStatement: '',
           description: '',
           category: '',
           priority: 'Medium',
+          technicalFeasibility: 'Medium',
           timeSaved: '',
           costSaved: '',
           impactNotes: ''
@@ -115,9 +121,11 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
     try {
       const formData = new FormData();
       formData.append('title', form.title);
+      formData.append('problemStatement', form.problemStatement);
       formData.append('description', form.description);
       formData.append('category', form.category);
       formData.append('priority', form.priority);
+      formData.append('technicalFeasibility', form.technicalFeasibility);
       formData.append(
         'impact',
         JSON.stringify({
@@ -149,9 +157,11 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
       // Reset form
       setForm({
         title: '',
+        problemStatement: '',
         description: '',
         category: '',
         priority: 'Medium',
+        technicalFeasibility: 'Medium',
         timeSaved: '',
         costSaved: '',
         impactNotes: ''
@@ -261,43 +271,61 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
                 </select>
               </div>
 
-              {/* Priority */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Priority <span className="text-red-500">*</span>
-                </label>
-                <div className="flex gap-4">
-                  {['High', 'Medium', 'Low'].map((p) => (
-                    <label
-                      key={p}
-                      className={`flex-1 relative flex items-center justify-center p-3 rounded-xl border-2 cursor-pointer transition-all duration-200
-                        ${form.priority === p
-                          ? p === 'High'
-                            ? 'border-red-500 bg-red-50 text-red-700 shadow-sm shadow-red-200'
-                            : p === 'Medium'
-                            ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-sm shadow-orange-200'
-                            : 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm shadow-blue-200'
-                          : 'border-gray-100 bg-gray-50 text-slate-500 hover:border-gray-200'
-                        }`}
-                    >
-                      <input
-                        type="radio"
-                        name="priority"
-                        value={p}
-                        checked={form.priority === p}
-                        onChange={handleChange}
-                        className="sr-only"
-                      />
-                      <span className="text-sm font-bold">{p}</span>
-                    </label>
-                  ))}
+              {/* Priority & Feasibility */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Priority <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="priority"
+                    value={form.priority}
+                    onChange={handleChange}
+                    className="select-field"
+                    required
+                  >
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Feasibility <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="technicalFeasibility"
+                    value={form.technicalFeasibility}
+                    onChange={handleChange}
+                    className="select-field"
+                    required
+                  >
+                    <option value="Easy">Easy (Low Effort)</option>
+                    <option value="Medium">Medium (Moderate Effort)</option>
+                    <option value="Hard">Hard (High Effort)</option>
+                  </select>
                 </div>
               </div>
 
-              {/* Description */}
+              {/* Problem Statement */}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Description <span className="text-red-500">*</span>
+                  Problem Statement <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="problemStatement"
+                  value={form.problemStatement}
+                  onChange={handleChange}
+                  placeholder="What is the problem or pain point you're trying to solve?"
+                  className="input-field min-h-[100px] resize-y"
+                  required
+                />
+              </div>
+
+              {/* Description / Proposed Solution */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Description / Proposed Solution <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   name="description"

@@ -1,7 +1,8 @@
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search } from 'lucide-react';
 
+/** Must match the 4 valid Mongoose status enum values */
 const categories = ['All', 'Software', 'Controls', 'Electrical', 'Mechanical'];
-const statuses = ['All', 'Submitted', 'Under Review', 'Approved', 'In Progress', 'Implemented', 'Rejected'];
+const statuses   = ['All', 'Pending', 'Approved', 'In Progress', 'Implemented'];
 
 export default function FilterBar({ filters, setFilters }) {
   const handleChange = (key, value) => {
@@ -16,7 +17,7 @@ export default function FilterBar({ filters, setFilters }) {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search ideas..."
+            placeholder="Search ideas…"
             value={filters.search}
             onChange={(e) => handleChange('search', e.target.value)}
             className="input-field pl-11"
@@ -32,7 +33,7 @@ export default function FilterBar({ filters, setFilters }) {
           >
             {categories.map((cat) => (
               <option key={cat} value={cat}>
-                {cat === 'All' ? '📁 All Categories' : cat}
+                {cat === 'All' ? 'All Categories' : cat}
               </option>
             ))}
           </select>
@@ -47,7 +48,7 @@ export default function FilterBar({ filters, setFilters }) {
           >
             {statuses.map((s) => (
               <option key={s} value={s}>
-                {s === 'All' ? '📊 All Statuses' : s}
+                {s === 'All' ? 'All Statuses' : s}
               </option>
             ))}
           </select>

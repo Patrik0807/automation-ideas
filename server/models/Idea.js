@@ -6,6 +6,10 @@ const ideaSchema = new mongoose.Schema({
     required: [true, 'Title is required'],
     trim: true
   },
+  problemStatement: {
+    type: String,
+    required: [true, 'Problem statement is required']
+  },
   description: {
     type: String,
     required: [true, 'Description is required']
@@ -18,6 +22,11 @@ const ideaSchema = new mongoose.Schema({
   priority: {
     type: String,
     enum: ['High', 'Medium', 'Low'],
+    default: 'Medium'
+  },
+  technicalFeasibility: {
+    type: String,
+    enum: ['Easy', 'Medium', 'Hard'],
     default: 'Medium'
   },
   status: {

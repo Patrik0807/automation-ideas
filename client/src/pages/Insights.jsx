@@ -5,7 +5,7 @@ import { BarChart3, PieChart as PieIcon, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import API from '../api/ideas';
 
-const COLORS = ['#F97316', '#10B981', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899'];
+const COLORS = ['#EB0A1E', '#1F2937', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6'];
 
 export default function Insights() {
   const [stats, setStats] = useState(null);
@@ -39,7 +39,7 @@ export default function Insights() {
       <div className="bg-white border-b border-gray-100 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link to="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <Link to="/ideas" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </Link>
             <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -123,22 +123,22 @@ export default function Insights() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mt-8 bg-gradient-to-r from-primary-500 to-orange-600 rounded-3xl p-8 text-white"
+          className="mt-8 bg-white border border-gray-100 shadow-sm rounded-3xl p-8"
         >
-          <div className="max-w-2xl">
-            <h2 className="text-2xl font-bold mb-2">Automation Impact</h2>
-            <p className="text-primary-50 opacity-90 mb-6">
+          <div className="max-w-2xl relative z-10">
+            <h2 className="text-2xl font-black text-slate-900 mb-2">Automation Impact</h2>
+            <p className="text-slate-500 mb-6 leading-relaxed">
               Visualizing the transformation of ideas into efficient automated solutions. 
               The statistics above represent our collective progress in Software, Controls, Electrical, and Mechanical domains.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-              <div>
-                <p className="text-primary-200 text-sm">Total Potential Saved</p>
-                <p className="text-2xl font-bold">500+ Hours</p>
+              <div className="border border-gray-100 bg-gray-50 rounded-2xl p-4">
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Potential Saved</p>
+                <p className="text-2xl font-black text-primary-600">500+ Hrs</p>
               </div>
-              <div>
-                <p className="text-primary-200 text-sm">Active Projects</p>
-                <p className="text-2xl font-bold">{stats?.total || 0}</p>
+              <div className="border border-gray-100 bg-gray-50 rounded-2xl p-4">
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Active Projects</p>
+                <p className="text-2xl font-black text-primary-600">{stats?.total || 0}</p>
               </div>
             </div>
           </div>

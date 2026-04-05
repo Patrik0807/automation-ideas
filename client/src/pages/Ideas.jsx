@@ -52,21 +52,21 @@ export default function Ideas() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-primary-500 via-primary-600 to-orange-700 relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3" />
+      <div className="bg-white border-b border-gray-100 relative overflow-hidden">
+        {/* Subtle background abstract elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/5 rounded-full -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-slate-200/20 rounded-full translate-y-1/2 -translate-x-1/3" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pt-16">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <h1 className="text-3xl sm:text-4xl font-bold text-white">
+              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                 Idea Dashboard
               </h1>
-              <p className="text-primary-100 mt-1">
+              <p className="text-slate-500 mt-1 font-medium">
                 Track and manage automation ideas across the organization
               </p>
             </motion.div>
@@ -77,9 +77,9 @@ export default function Ideas() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 bg-white text-primary-600 font-bold
+              className="flex items-center gap-2 bg-primary-500 text-white font-bold
                          px-6 py-3 rounded-xl shadow-lg shadow-primary-700/20
-                         hover:shadow-xl transition-all duration-200"
+                         hover:bg-primary-600 hover:shadow-xl transition-all duration-200"
             >
               <Plus className="w-5 h-5" />
               Submit Idea
@@ -89,7 +89,7 @@ export default function Ideas() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 relative z-10 pb-12">
         {/* Stats */}
         <div className="mb-6">
           <StatsBar 
@@ -106,7 +106,7 @@ export default function Ideas() {
         {/* Ideas Grid */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-gray-200 border-t-primary-500 rounded-full animate-spin" />
             <p className="text-slate-500 mt-4 font-medium">Loading ideas...</p>
           </div>
         ) : ideas.length === 0 ? (

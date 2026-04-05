@@ -68,7 +68,7 @@ const getIdea = async (req, res) => {
 // @route   POST /api/ideas
 const createIdea = async (req, res) => {
   try {
-    const { title, description, category, priority } = req.body;
+    const { title, problemStatement, description, category, priority, technicalFeasibility } = req.body;
 
     // Impact may come as JSON string from FormData
     let impact = req.body.impact;
@@ -83,9 +83,11 @@ const createIdea = async (req, res) => {
 
     const idea = await Idea.create({
       title,
+      problemStatement,
       description,
       category,
       priority,
+      technicalFeasibility: technicalFeasibility || 'Medium',
       impact,
       images,
       submittedBy: req.user._id,
@@ -131,11 +133,13 @@ const updateIdea = async (req, res) => {
       try { impact = JSON.parse(impact); } catch (e) { impact = {}; }
     }
 
-    const { title, description, category, priority } = req.body;
+    const { title, problemStatement, description, category, priority, technicalFeasibility } = req.body;
     if (title) idea.title = title;
+    if (problemStatement) idea.problemStatement = problemStatement;
     if (description) idea.description = description;
     if (category) idea.category = category;
     if (priority) idea.priority = priority;
+    if (technicalFeasibility) idea.technicalFeasibility = technicalFeasibility;
     if (impact) idea.impact = { ...idea.impact, ...impact };
 
     if (req.files && req.files.length > 0) {
