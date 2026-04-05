@@ -8,12 +8,20 @@ import IdeaDetail from './pages/IdeaDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Landing from './pages/Landing';
+import IdeasTable from './pages/IdeasTable';
 
 /** Redirects authenticated users away from public-only pages */
 function PublicRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen />;
-  return user ? <Navigate to="/ideas" replace /> : children;
+  return !user ? children : <Navigate to="/ideas" replace />;
+}
+
+/** Allows both guest and authenticated users */
+function BaseRoute({ children }) {
+  const { loading } = useAuth();
+  if (loading) return <LoadingScreen />;
+  return children;
 }
 
 /** Blocks unauthenticated users from protected pages */
@@ -55,39 +63,25 @@ export default function App() {
       </div>
 
       <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Navbar only shown when logged in */}
-        {user && <Navbar />}
+        {/* Navbar shown for all users */}
+        <Navbar />
 
         <main className="flex-1">
           <Routes>
-            {/* ── Public Routes ─────────────────────────── */}
-            <Route path="/" element={
-              <PublicRoute>
-                <Landing />
-              </PublicRoute>
-            } />
+            {/* ── Public/Base Routes ─────────────────────────── */}
+            <Route path="/" element={<BaseRoute><Landing /></BaseRoute>} />
+            
             <Route path="/login" element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
+              <PublicRoute><Login /></PublicRoute>
             } />
             <Route path="/register" element={
-              <PublicRoute>
-                <Register />
-              </PublicRoute>
+              <PublicRoute><Register /></PublicRoute>
             } />
 
-            {/* ── Protected Routes ──────────────────────── */}
-            <Route path="/ideas" element={
-              <ProtectedRoute><Ideas /></ProtectedRoute>
-            } />
-            <Route path="/ideas/:id" element={
-              <ProtectedRoute><IdeaDetail /></ProtectedRoute>
-            } />
-
-            <Route path="/insights" element={
-              <ProtectedRoute><Insights /></ProtectedRoute>
-            } />
+            <Route path="/ideas" element={<BaseRoute><Ideas /></BaseRoute>} />
+            <Route path="/ideas/:id" element={<BaseRoute><IdeaDetail /></BaseRoute>} />
+            <Route path="/ideas-table" element={<BaseRoute><IdeasTable /></BaseRoute>} />
+            <Route path="/insights" element={<BaseRoute><Insights /></BaseRoute>} />
 
             {/* ── Fallback ──────────────────────────────── */}
             <Route path="*" element={<Navigate to="/" replace />} />

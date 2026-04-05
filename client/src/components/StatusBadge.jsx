@@ -27,6 +27,12 @@ const statusConfig = {
     border: 'border-green-200',
     dot:    'bg-green-600',
   },
+  Rejected: {
+    bg:     'bg-rose-50',
+    text:   'text-rose-700',
+    border: 'border-rose-200',
+    dot:    'bg-rose-500',
+  },
 };
 
 /** Fall back to Pending styling if an unrecognised value arrives */

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Lightbulb, Search } from 'lucide-react';
 import API from '../api/ideas';
@@ -8,6 +9,7 @@ import IdeaCard from '../components/IdeaCard';
 import IdeaForm from '../components/IdeaForm';
 
 export default function Ideas() {
+  const location = useLocation();
   const [ideas, setIdeas] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,6 +19,15 @@ export default function Ideas() {
     category: 'All',
     status: 'All'
   });
+
+  // Handle auto-open form from Landing state
+  useEffect(() => {
+    if (location.state?.openForm) {
+      setShowForm(true);
+      // Clean up state so it doesn't re-open on refresh/navigation
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -50,15 +61,15 @@ export default function Ideas() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* Hero Header */}
-      <div className="bg-white border-b border-gray-100 relative overflow-hidden">
+      <div className="bg-white border-b-2 border-gray-100 relative overflow-hidden">
         {/* Subtle background abstract elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/5 rounded-full -translate-y-1/2 translate-x-1/3" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-slate-200/20 rounded-full translate-y-1/2 -translate-x-1/3" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pt-16">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -66,7 +77,7 @@ export default function Ideas() {
               <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
                 Idea Dashboard
               </h1>
-              <p className="text-slate-500 mt-1 font-medium">
+              <p className="text-slate-500 mt-2 font-bold text-base">
                 Track and manage automation ideas across the organization
               </p>
             </motion.div>
@@ -78,8 +89,8 @@ export default function Ideas() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowForm(true)}
               className="flex items-center gap-2 bg-primary-500 text-white font-bold
-                         px-6 py-3 rounded-xl shadow-lg shadow-primary-700/20
-                         hover:bg-primary-600 hover:shadow-xl transition-all duration-200"
+                         px-8 py-4 rounded-xl shadow-lg shadow-primary-700/20
+                         hover:bg-primary-600 hover:shadow-xl transition-all duration-200 border-2 border-primary-400"
             >
               <Plus className="w-5 h-5" />
               Submit Idea
@@ -89,9 +100,9 @@ export default function Ideas() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 relative z-10 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 relative z-10">
         {/* Stats */}
-        <div className="mb-6">
+        <div className="mb-8">
           <StatsBar 
             stats={stats} 
             onFilterSelect={(status) => setFilters(prev => ({ ...prev, status }))}
@@ -99,7 +110,7 @@ export default function Ideas() {
         </div>
 
         {/* Filters */}
-        <div className="mb-6">
+        <div className="mb-8 p-1 bg-white rounded-2xl border-2 border-gray-100 shadow-sm">
           <FilterBar filters={filters} setFilters={setFilters} />
         </div>
 
@@ -107,34 +118,34 @@ export default function Ideas() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-12 h-12 border-4 border-gray-200 border-t-primary-500 rounded-full animate-spin" />
-            <p className="text-slate-500 mt-4 font-medium">Loading ideas...</p>
+            <p className="text-slate-500 mt-4 font-bold">Loading ideas...</p>
           </div>
         ) : ideas.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-20"
+            className="text-center py-24 bg-white rounded-[2.5rem] border-2 border-dashed border-gray-200"
           >
-            <div className="bg-primary-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="bg-primary-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
               {filters.search || filters.category !== 'All' || filters.status !== 'All' ? (
                 <Search className="w-8 h-8 text-primary-400" />
               ) : (
                 <Lightbulb className="w-8 h-8 text-primary-400" />
               )}
             </div>
-            <h3 className="text-lg font-semibold text-slate-700 mb-1">
+            <h3 className="text-2xl font-black text-slate-800 mb-2 tracking-tight">
               {filters.search || filters.category !== 'All' || filters.status !== 'All'
-                ? 'No ideas match your filters'
+                ? 'No matches found'
                 : 'No ideas yet'}
             </h3>
-            <p className="text-slate-500 text-sm">
+            <p className="text-slate-500 font-bold max-w-xs mx-auto leading-relaxed">
               {filters.search || filters.category !== 'All' || filters.status !== 'All'
-                ? 'Try adjusting your search or filters'
-                : 'Be the first to submit an automation idea!'}
+                ? 'Try adjusting your search or category filters.'
+                : 'Be the first to submit a high-impact automation idea for the facility.'}
             </p>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {ideas.map((idea, index) => (
               <IdeaCard key={idea._id} idea={idea} index={index} />
             ))}

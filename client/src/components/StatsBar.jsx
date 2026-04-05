@@ -1,11 +1,5 @@
 import { motion } from 'framer-motion';
-import {
-  Lightbulb,
-  CheckCircle2,
-  Clock,
-  Rocket,
-  Hourglass
-} from 'lucide-react';
+import { Lightbulb, Hourglass, CheckCircle2, Clock, Rocket, XCircle } from 'lucide-react';
 
 /** Cards must match the 4 valid Mongoose status enum values */
 const statCards = [
@@ -49,6 +43,14 @@ const statCards = [
     bg:       'bg-green-50',
     ring:     'border-green-100',
   },
+  {
+    key:      'Rejected',
+    label:    'Rejected',
+    icon:     XCircle,
+    iconColor: '#F43F5E', // rose-500
+    bg:       'bg-rose-50',
+    ring:     'border-rose-100',
+  },
 ];
 
 export default function StatsBar({ stats, onFilterSelect }) {
@@ -64,7 +66,7 @@ export default function StatsBar({ stats, onFilterSelect }) {
   };
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
       {statCards.map((card, index) => {
         const Icon  = card.icon;
         const count = getCount(card.key);

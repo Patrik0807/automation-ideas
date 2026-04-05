@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const ideaSchema = new mongoose.Schema({
+  customId: {
+    type: String,
+    unique: true
+  },
   title: {
     type: String,
     required: [true, 'Title is required'],
@@ -16,7 +20,7 @@ const ideaSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['Software', 'Controls', 'Electrical', 'Mechanical'],
+    enum: ['Software', 'Controls', 'Electrical', 'Mechanical', 'Other'],
     required: [true, 'Category is required']
   },
   priority: {
@@ -31,7 +35,7 @@ const ideaSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Pending', 'Approved', 'In Progress', 'Implemented'],
+    enum: ['Pending', 'Approved', 'In Progress', 'Implemented', 'Rejected'],
     default: 'Pending'
   },
   statusHistory: [
@@ -55,7 +59,10 @@ const ideaSchema = new mongoose.Schema({
   submittedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false
+  },
+  submittedByName: {
+    type: String
   },
   createdAt: {
     type: Date,

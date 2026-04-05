@@ -33,6 +33,7 @@ const allStatuses = [
   'Approved',
   'In Progress',
   'Implemented',
+  'Rejected',
 ];
 
 export default function IdeaDetail() {
@@ -111,9 +112,9 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
     }
   };
 
-  // Progress bar — based on the 4 valid model statuses
+  // Progress bar — based on the 5 valid model statuses
   const getProgress = () => {
-    const statusOrder = ['Pending', 'Approved', 'In Progress', 'Implemented'];
+    const statusOrder = ['Pending', 'Approved', 'In Progress', 'Implemented', 'Rejected'];
     const idx = statusOrder.indexOf(idea?.status);
     if (idx === -1) return 0;
     return ((idx + 1) / statusOrder.length) * 100;
@@ -133,7 +134,7 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
   if (!idea) return null;
 
   const isAdmin = user?.role === 'admin';
-  const isOwner = user?._id === idea.submittedBy?._id;
+  const isOwner = false; // As per user request, only Admin can edit/delete/status update
 
   return (
     <div className="min-h-screen bg-gray-50 pb-12">
@@ -183,7 +184,7 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
                   </span>
 
                   {/* Inline Dropdowns mapping exactly to user request */}
-                  {(isAdmin || isOwner) && (
+                  {isAdmin && (
                     <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-200">
                       <select
                         value={idea.priority}
@@ -240,7 +241,7 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
 
               {/* Action Buttons */}
               <div className="flex gap-2">
-                {(isAdmin || isOwner) && (
+                {isAdmin && (
                   <>
                     <button
                       onClick={() => setShowEditForm(true)}
@@ -432,6 +433,10 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
                         src={img}
                         alt={`Attachment ${i + 1}`}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://placehold.co/800x400/f8fafc/64748b?text=Image+Unavailable';
+                        }}
                       />
                     </motion.div>
                   ))}
@@ -500,14 +505,14 @@ const [newFiles, setNewFiles] = useState([]); // only newly uploaded files
               </h2>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  {idea.submittedBy?.name?.charAt(0) || '?'}
+                  {(idea.submittedBy?.name || idea.submittedByName || '?').charAt(0)}
                 </div>
                 <div>
                   <p className="font-semibold text-slate-800">
-                    {idea.submittedBy?.name || 'Unknown'}
+                    {idea.submittedBy?.name || idea.submittedByName || 'Anonymous'}
                   </p>
                   <p className="text-sm text-slate-500">
-                    {idea.submittedBy?.email}
+                    {idea.submittedBy?.email || 'N/A'}
                   </p>
                   {idea.submittedBy?.department && (
                     <p className="text-xs text-primary-600 font-medium mt-0.5">

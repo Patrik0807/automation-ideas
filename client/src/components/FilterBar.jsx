@@ -2,7 +2,7 @@ import { Search } from 'lucide-react';
 
 /** Must match the 4 valid Mongoose status enum values */
 const categories = ['All', 'Software', 'Controls', 'Electrical', 'Mechanical'];
-const statuses   = ['All', 'Pending', 'Approved', 'In Progress', 'Implemented'];
+const statuses   = ['All', 'Pending', 'Approved', 'In Progress', 'Implemented', 'Rejected'];
 
 export default function FilterBar({ filters, setFilters }) {
   const handleChange = (key, value) => {

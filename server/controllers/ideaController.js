@@ -1,4 +1,5 @@
 const Idea = require('../models/Idea');
+const Counter = require('../models/Counter');
 
 // @desc    Get all ideas (with search/filter)
 // @route   GET /api/ideas
@@ -68,7 +69,34 @@ const getIdea = async (req, res) => {
 // @route   POST /api/ideas
 const createIdea = async (req, res) => {
   try {
-    const { title, problemStatement, description, category, priority, technicalFeasibility } = req.body;
+    const { 
+      title, 
+      problemStatement, 
+      description, 
+      category, 
+      priority, 
+      technicalFeasibility,
+      submittedByName 
+    } = req.body;
+
+    // Prefix Mapper per Category
+    const prefixMap = {
+      'Software': 'S',
+      'Mechanical': 'M',
+      'Controls': 'C',
+      'Electrical': 'E',
+      'Other': 'O'
+    };
+    const prefix = prefixMap[category] || 'O';
+
+    // Increment counter for prefix atomically
+    const counter = await Counter.findOneAndUpdate(
+      { _id: prefix },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    const customId = `${prefix}${counter.seq}`;
 
     // Impact may come as JSON string from FormData
     let impact = req.body.impact;
@@ -82,6 +110,7 @@ const createIdea = async (req, res) => {
       : [];
 
     const idea = await Idea.create({
+      customId,
       title,
       problemStatement,
       description,
@@ -90,13 +119,14 @@ const createIdea = async (req, res) => {
       technicalFeasibility: technicalFeasibility || 'Medium',
       impact,
       images,
-      submittedBy: req.user._id,
+      submittedBy: req.user ? req.user._id : null,
+      submittedByName: req.user ? req.user.name : submittedByName,
       statusHistory: [
         {
           status: 'Pending',
           date: new Date(),
           note: 'Idea submitted',
-          updatedBy: req.user._id
+          updatedBy: req.user ? req.user._id : null
         }
       ]
     });
@@ -117,14 +147,11 @@ const updateIdea = async (req, res) => {
       return res.status(404).json({ message: 'Idea not found' });
     }
 
-    // Only submitter or admin can update
-    if (
-      idea.submittedBy.toString() !== req.user._id.toString() &&
-      req.user.role !== 'admin'
-    ) {
+    // Only admin can update
+    if (req.user.role !== 'admin') {
       return res
         .status(403)
-        .json({ message: 'Not authorized to update this idea' });
+        .json({ message: 'Not authorized. Admin privileges required.' });
     }
 
     // Impact may come as JSON string from FormData
@@ -160,8 +187,13 @@ const updateIdea = async (req, res) => {
 const updateStatus = async (req, res) => {
   try {
     const { status, note } = req.body;
-    const idea = await Idea.findById(req.params.id);
+    const validStatuses = ['Pending', 'Approved', 'In Progress', 'Implemented', 'Rejected'];
 
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid or missing status' });
+    }
+
+    const idea = await Idea.findById(req.params.id);
     if (!idea) {
       return res.status(404).json({ message: 'Idea not found' });
     }
@@ -194,13 +226,10 @@ const deleteIdea = async (req, res) => {
       return res.status(404).json({ message: 'Idea not found' });
     }
 
-    if (
-      idea.submittedBy.toString() !== req.user._id.toString() &&
-      req.user.role !== 'admin'
-    ) {
+    if (req.user.role !== 'admin') {
       return res
         .status(403)
-        .json({ message: 'Not authorized to delete this idea' });
+        .json({ message: 'Not authorized. Admin privileges required.' });
     }
 
     await idea.deleteOne();

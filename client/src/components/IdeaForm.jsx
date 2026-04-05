@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Lightbulb, Send, ImagePlus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 import API from '../api/ideas';
 
-const categories = ['Software', 'Controls', 'Electrical', 'Mechanical'];
+const categories = ['Software', 'Controls', 'Electrical', 'Mechanical', 'Other'];
 
 export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
   const [form, setForm] = useState({
@@ -16,9 +17,11 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
     technicalFeasibility: 'Medium',
     timeSaved: '',
     costSaved: '',
-    impactNotes: ''
+    impactNotes: '',
+    submittedByName: ''
   });
 
+  const { user } = useAuth();
   const [images, setImages] = useState([]); // For preview & display
   const [previews, setPreviews] = useState([]);
   const [newFiles, setNewFiles] = useState([]); // New File uploads
@@ -39,7 +42,8 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
           technicalFeasibility: initialData.technicalFeasibility || 'Medium',
           timeSaved: initialData.impact?.timeSaved || '',
           costSaved: initialData.impact?.costSaved || '',
-          impactNotes: initialData.impact?.notes || ''
+          impactNotes: initialData.impact?.notes || '',
+          submittedByName: initialData.submittedByName || ''
         });
 
         const existingImages = initialData.images || [];
@@ -57,7 +61,8 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
           technicalFeasibility: 'Medium',
           timeSaved: '',
           costSaved: '',
-          impactNotes: ''
+          impactNotes: '',
+          submittedByName: user?.name || ''
         });
         setImages([]);
         setPreviews([]);
@@ -65,7 +70,7 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
         setDeletedImages([]);
       }
     }
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen, user]);
 
   // Handle new image selection
   const handleImageSelect = (e) => {
@@ -112,7 +117,7 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title || !form.description || !form.category) {
+    if (!form.title || !form.description || !form.category || (!user && !form.submittedByName)) {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -126,6 +131,7 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
       formData.append('category', form.category);
       formData.append('priority', form.priority);
       formData.append('technicalFeasibility', form.technicalFeasibility);
+      formData.append('submittedByName', user ? user.name : form.submittedByName);
       formData.append(
         'impact',
         JSON.stringify({
@@ -164,7 +170,8 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
         technicalFeasibility: 'Medium',
         timeSaved: '',
         costSaved: '',
-        impactNotes: ''
+        impactNotes: '',
+        submittedByName: user?.name || ''
       });
       setImages([]);
       setPreviews((prev) => {
@@ -245,6 +252,21 @@ export default function IdeaForm({ isOpen, onClose, onCreated, initialData }) {
                   value={form.title}
                   onChange={handleChange}
                   placeholder="e.g., Automated Invoice Processing"
+                  className="input-field"
+                  required
+                />
+              </div>
+
+              {/* Submitter Name (Visible for Guests) */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Your Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  name="submittedByName"
+                  value={form.submittedByName}
+                  onChange={handleChange}
+                  placeholder="Enter your name"
                   className="input-field"
                   required
                 />

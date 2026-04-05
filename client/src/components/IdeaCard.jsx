@@ -7,7 +7,6 @@ import {
   Lightbulb,
   IndianRupee,
   Clock,
-  Search,
   Wrench
 } from 'lucide-react';
 
@@ -44,6 +43,10 @@ export default function IdeaCard({ idea, index }) {
               src={idea.images[0]} 
               alt="Idea thumbnail" 
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://placehold.co/400x400/f8fafc/64748b?text=Image+Unavailable';
+              }}
             />
           </div>
         ) : (
@@ -82,7 +85,7 @@ export default function IdeaCard({ idea, index }) {
       <p className="text-slate-500 text-sm leading-relaxed line-clamp-2 mb-6 relative z-10 flex-1">
         {idea.description}
       </p>
-
+      
       {/* Optional Large Thumbnail for Premium Vibe */}
       {idea.images && idea.images.length > 0 && (
         <div className="w-full h-36 rounded-2xl overflow-hidden mb-6 relative z-10 ring-1 ring-gray-100 shadow-sm">
@@ -90,6 +93,10 @@ export default function IdeaCard({ idea, index }) {
             src={idea.images[0]}
             alt={idea.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = 'https://placehold.co/800x400/f8fafc/64748b?text=Image+Unavailable';
+            }}
           />
           {idea.images.length > 1 && (
             <div className="absolute bottom-2 right-2 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm">
@@ -124,7 +131,7 @@ export default function IdeaCard({ idea, index }) {
             <User className="w-3.5 h-3.5 text-primary-600" />
           </div>
           <span className="text-xs font-semibold text-slate-500">
-            {idea.submittedBy?.name || 'Unknown'}
+            {idea.submittedBy?.name || idea.submittedByName || 'Anonymous'}
           </span>
         </div>
         
